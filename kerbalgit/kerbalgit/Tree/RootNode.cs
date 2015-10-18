@@ -6,5 +6,11 @@ namespace kerbalgit.Tree {
 		public override string Path {
 			get { return string.Empty; }
 		}
+
+		public override int Depth {
+			get {
+				return 0;
+			}
+		}
 	}
 }

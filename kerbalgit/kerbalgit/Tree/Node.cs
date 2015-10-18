@@ -11,5 +11,13 @@ namespace kerbalgit.Tree {
 		public void AddChild(AbstractNode node) {
 			Children.Add(node);
 		}
+
+		public override void ForEach(System.Action<AbstractNode> method) {
+			base.ForEach(method);
+
+			foreach (var child in Children) {
+				child.ForEach(method);
+			}
+		}
 	}
 }

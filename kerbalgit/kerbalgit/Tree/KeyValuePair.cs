@@ -6,5 +6,9 @@ namespace kerbalgit.Tree {
 		public KeyValuePair(string name, string value, Node parent) : base(name, parent) {
 			this.Value = value;
 		}
+
+		public override string ToString() {
+			return base.ToString() + " = " + Value ?? string.Empty;
+		}
 	}
 }
