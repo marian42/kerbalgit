@@ -43,6 +43,10 @@
   <ItemGroup>
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tree\AbstractNode.cs" />
+    <Compile Include="Tree\Node.cs" />
+    <Compile Include="Tree\KeyValuePair.cs" />
+    <Compile Include="Tree\RootNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
