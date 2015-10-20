@@ -42,12 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Parser.cs" />
+    <Compile Include="GameObjects\Part.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\AbstractNode.cs" />
     <Compile Include="Tree\Node.cs" />
     <Compile Include="Tree\KeyValuePair.cs" />
     <Compile Include="Tree\RootNode.cs" />
+    <Compile Include="GameObjects\Vessel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
