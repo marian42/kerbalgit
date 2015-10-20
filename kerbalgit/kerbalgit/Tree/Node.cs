@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace kerbalgit.Tree {
 	public class Node : AbstractNode {
@@ -18,6 +19,17 @@ namespace kerbalgit.Tree {
 			foreach (var child in Children) {
 				child.ForEach(method);
 			}
+		}
+
+		public override AbstractNode Get(string address) {
+			if (address.Equals(string.Empty)) {
+				return this;
+			}
+
+			var firstStep = address.Split('/').First();
+			var remainingAddress = firstStep.Length == address.Length ? "" : address.Substring(firstStep.Length + 1);
+
+			return Children.First(node => node.Name == firstStep).Get(remainingAddress);
 		}
 	}
 }

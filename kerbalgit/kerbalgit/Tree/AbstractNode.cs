@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace kerbalgit.Tree {
 	public abstract class AbstractNode {
@@ -33,6 +34,22 @@ namespace kerbalgit.Tree {
 
 		public virtual void ForEach(Action<AbstractNode> method) {
 			method(this);
+		}
+
+		public virtual AbstractNode Get(string address) {
+			if (address.Equals(string.Empty)) {
+				return this;
+			}
+
+			throw new InvalidOperationException("Node has no children.");
+		}
+
+		public string GetValue(string address) {
+			return (Get(address) as KeyValuePair).Value;
+		}
+
+		public long GetInt(string address) {
+			return long.Parse(GetValue(address));
 		}
 	}
 }
