@@ -6,13 +6,16 @@ namespace kerbalgit.GameObjects {
 	public class Planetarium {
 		public static Lazy<Planetarium> Instance = new Lazy<Planetarium>();
 
+		public readonly CelestialBody Kerbin;
+
 		public readonly IReadOnlyCollection<CelestialBody> Bodies;
 
 		public Planetarium() {
 			var items = new List<CelestialBody>();
 
 			items.Add(new CelestialBody("Kerbol", 0, 261600000, 0, 1000000000, double.PositiveInfinity));
-			items.Add(new CelestialBody("Kerbin", 1, 600000, 70000, 250000, 84159286));
+			Kerbin = new CelestialBody("Kerbin", 1, 600000, 70000, 250000, 84159286);
+			items.Add(Kerbin);
 			items.Add(new CelestialBody("Moho", 4, 250000, 0, 80000, 9646663));
 			items.Add(new CelestialBody("Eve", 5, 700000, 90000, 400000, 85109365));
 			items.Add(new CelestialBody("Gilly", 13, 13000, 0, 6000,  126123));

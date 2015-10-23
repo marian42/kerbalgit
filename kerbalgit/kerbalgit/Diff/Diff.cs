@@ -83,6 +83,7 @@ namespace kerbalgit.Diff {
 
 			analyzeUnDocking();
 			analyzeDocking();
+			compareVessels();
 		}
 
 		private void analyzeUnDocking() {
@@ -103,8 +104,48 @@ namespace kerbalgit.Diff {
 			}
 		}
 
-			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.LostOrGainedParts)) {
-				addMessage(vesselInfo.Vessel.Name + " lost parts!", 2);
+		private void compareVessels() {
+			HashSet<Vessel> visitedOldVessels = new HashSet<Vessel>();
+
+			foreach (var vesselInfo in newVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() >= 1)) {
+				var oldVessel = vesselInfo.CorrespondingVessels.OrderBy(vessel => vessel.Name.Length).First();
+				var newVessel = vesselInfo.Vessel;
+
+				if (!visitedOldVessels.Contains(oldVessel)) {
+					compareVessels(oldVessel, vesselInfo.Vessel);
+					visitedOldVessels.Add(oldVessel);
+				}
+			}
+		}
+
+		private void compareVessels(Vessel oldVessel, Vessel newVessel) {
+			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
+				addMessage("Launched " + oldVessel.Name + " into " + newVessel.Orbit.GetName(true, true) + ".", 0);
+			}
+			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && (newVessel.FlightStateValue == Vessel.FlighState.Landed && newVessel.FlightStateValue == Vessel.FlighState.Splashed)) {
+				if (newVessel.CelestialBody == Planetarium.Instance.Value.Kerbin) {
+					addMessage("Launched " + oldVessel.Name + " on Kerbin.", 0);
+				} else {
+					addMessage("Launched " + oldVessel.Name + " and " + newVessel.FlightStateValue.ToString().ToLower() +  " on " + newVessel.CelestialBody.Name + ".", 0);
+				}
+			}
+			if (oldVessel.FlightStateValue == Vessel.FlighState.Orbiting && newVessel.FlightStateValue == Vessel.FlighState.Landed) {
+				if (oldVessel.CelestialBody == newVessel.CelestialBody) {
+					addMessage("Landed " + oldVessel.Name + " on " + newVessel.CelestialBody.Name + ".", 0);
+				} else {
+					addMessage(oldVessel.Name + " travelled from " + oldVessel.Orbit.GetName(true, true) + " to " + newVessel.CelestialBody.Name + " and landed there.", 0);
+				}
+				
+			}
+			if (oldVessel.FlightStateValue == Vessel.FlighState.Orbiting && newVessel.FlightStateValue == Vessel.FlighState.Splashed) {
+				if (oldVessel.CelestialBody == newVessel.CelestialBody) {
+					addMessage(oldVessel.Name + " splashed down on " + newVessel.CelestialBody.Name + ".", 0);
+				} else {
+					addMessage(oldVessel.Name + " travelled from " + oldVessel.Orbit.GetName(true, true) + " to " + newVessel.CelestialBody.Name + " and splashed down.", 0);
+				}
+			}
+			if ((oldVessel.FlightStateValue == Vessel.FlighState.Landed || oldVessel.FlightStateValue == Vessel.FlighState.Splashed) && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
+				addMessage(oldVessel.Name + " took off from " + oldVessel.CelestialBody + " and went into " + newVessel.Orbit.GetName(false, true), 0);
 			}
 		}
 
@@ -117,5 +158,9 @@ namespace kerbalgit.Diff {
 		private void addMessage(string message, int priority) {
 			commitMessages.Add(new CommitMessage(message, priority));
 		}
+
+		public IReadOnlyCollection<Vessel> GetNewVessels() {
+			return newVessels.Values.Select(info => info.Vessel).ToList().AsReadOnly();
+		}		
 	}
 }

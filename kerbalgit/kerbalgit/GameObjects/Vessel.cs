@@ -1,11 +1,20 @@
 ﻿using kerbalgit.Tree;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace kerbalgit.GameObjects {
 	public class Vessel {
+		public enum FlighState {
+			Orbiting,
+			Prelaunch,
+			Landed,
+			Splashed
+		}
+
 		public readonly Node Node;
 		public readonly List<Part> parts;
+		public readonly Orbit Orbit;
 
 		public Vessel(Node node) {
 			if (node.Name != "vessel") {
@@ -14,6 +23,7 @@ namespace kerbalgit.GameObjects {
 
 			this.Node = node;
 			this.parts = new List<Part>();
+			this.Orbit = new Orbit(node.Get("orbit") as Node);
 		}
 
 		public string Id {
@@ -34,6 +44,29 @@ namespace kerbalgit.GameObjects {
 
 		public override bool Equals(object obj) {
 			return obj is Vessel && (obj as Vessel).Id == Id;
+		}
+
+		public string StatusReport {
+			get {
+				var result = string.Empty;
+				result += "Name: " + Name + "\n";
+				result += "Flightstate: " + FlightStateValue.ToString() + "\n";
+				result += "Orbit: " + Orbit.GetName() + "\n";
+
+				return result;
+			}
+		}
+
+		public FlighState FlightStateValue {
+			get {
+				return Enum.GetValues(typeof(Vessel.FlighState)).Cast<Vessel.FlighState>().First(flightState => flightState.ToString().ToLower() == Node.GetValue("sit").ToLower());
+			}
+		}
+
+		public CelestialBody CelestialBody {
+			get {
+				return Orbit.CelestialBody;
+			}
 		}
 	}
 }
