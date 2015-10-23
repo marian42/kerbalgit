@@ -82,6 +82,7 @@ namespace kerbalgit.Diff {
 			commitMessages = new List<CommitMessage>();
 
 			analyzeUnDocking();
+			analyzeDocking();
 		}
 
 		private void analyzeUnDocking() {
@@ -91,6 +92,16 @@ namespace kerbalgit.Diff {
 
 				addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name, 0);
 			}
+		}
+
+		private void analyzeDocking() {
+			foreach (var vesselInfo in newVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() > 1)) {
+				var motherShip = vesselInfo.CorrespondingVessels.OrderBy(vessel => vessel.Name.Length).First();
+				var dockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip);
+
+				addMessage("Docked " + CommitMessage.Enumerate(dockedShips.Select(vessel => vessel.Name)) + " to " + motherShip.Name, 0);
+			}
+		}
 
 			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.LostOrGainedParts)) {
 				addMessage(vesselInfo.Vessel.Name + " lost parts!", 2);
