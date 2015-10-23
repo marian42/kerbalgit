@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace kerbalgit {
@@ -17,6 +18,23 @@ namespace kerbalgit {
 			}
 
 			return string.Join(", ", items.Take(items.Count() - 1)) + " and " + items.Last();
+		}
+
+		public static string AddMetricPrefix(double value, string format = "F0") {
+			char[] incPrefixes = new[] { 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
+			char[] decPrefixes = new[] { 'm', '\u03bc', 'n', 'p', 'f', 'a', 'z', 'y' };
+
+			int degree = (int)Math.Floor(Math.Log10(Math.Abs(value)) / 3);
+			double scaled = value * Math.Pow(1000, -degree);
+
+			char? prefix = null;
+			switch (Math.Sign(degree))
+			{
+				case 1:  prefix = incPrefixes[degree - 1]; break;
+				case -1: prefix = decPrefixes[-degree - 1]; break;
+			}
+
+			return scaled.ToString(format) + prefix;
 		}
 	}
 }

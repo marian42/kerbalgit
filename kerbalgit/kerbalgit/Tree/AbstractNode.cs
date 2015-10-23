@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 
 namespace kerbalgit.Tree {
@@ -50,6 +51,10 @@ namespace kerbalgit.Tree {
 
 		public long GetInt(string address) {
 			return long.Parse(GetValue(address));
+		}
+
+		public double GetDouble(string address) {
+			return double.Parse(GetValue(address), CultureInfo.InvariantCulture);
 		}
 	}
 }
