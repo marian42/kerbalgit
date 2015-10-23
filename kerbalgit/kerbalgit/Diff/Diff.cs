@@ -1,5 +1,6 @@
 ﻿using kerbalgit.GameObjects;
 using kerbalgit.Tree;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -83,6 +84,7 @@ namespace kerbalgit.Diff {
 
 			analyzeUnDocking();
 			analyzeDocking();
+			trackLostAndFoundShips();
 			compareVessels();
 		}
 
@@ -101,6 +103,30 @@ namespace kerbalgit.Diff {
 				var dockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip);
 
 				addMessage("Docked " + CommitMessage.Enumerate(dockedShips.Select(vessel => vessel.Name)) + " to " + motherShip.Name, 0);
+			}
+		}
+
+		private void trackLostAndFoundShips() {
+			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() == 0)) {
+				if (vesselInfo.Vessel.CelestialBody == Planetarium.Instance.Value.Kerbin && vesselInfo.Vessel.FlightStateValue != Vessel.FlighState.Orbiting) {
+					addMessage("Recovered " + vesselInfo.Vessel.Name + ".", 2);
+				} else {
+					addMessage("Lost track of " + vesselInfo.Vessel.Name + " (probably recovered).", 2);
+				}
+			}
+
+			foreach (var vesselInfo in newVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() == 0)) {
+				switch (vesselInfo.Vessel.FlightStateValue) {
+					case Vessel.FlighState.Prelaunch:
+						addMessage("Put " + vesselInfo.Vessel.Name + " on the " + vesselInfo.Vessel.Location.ToLower() + ".", 0); break;
+					case Vessel.FlighState.Landed:
+						addMessage("Launched " + vesselInfo.Vessel.Name + " and landed on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
+					case Vessel.FlighState.Splashed:
+						addMessage("Launched " + vesselInfo.Vessel.Name + " and splashed down on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
+					case Vessel.FlighState.Orbiting:
+						addMessage("Launched " + vesselInfo.Vessel.Name + " into " + vesselInfo.Vessel.Orbit.GetName(true, true), 0); break;
+					default: throw new NotImplementedException(vesselInfo.Vessel.FlightStateValue.ToString());
+				}
 			}
 		}
 

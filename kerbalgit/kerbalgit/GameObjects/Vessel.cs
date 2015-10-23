@@ -68,5 +68,11 @@ namespace kerbalgit.GameObjects {
 				return Orbit.CelestialBody;
 			}
 		}
+
+		public string Location {
+			get {
+				return Node.GetValue("landedAt");
+			}
+		}
 	}
 }
