@@ -187,6 +187,8 @@ namespace kerbalgit.Diff {
 				addMessage(oldVessel.Name + " triggered stages " + oldVessel.Stage + " and " + (oldVessel.Stage + 1) + ".", 3);
 			} else if (oldVessel.Stage > newVessel.Stage) {
 				addMessage(oldVessel.Name + " triggered stages " + oldVessel.Stage + " to " + (newVessel.Stage + 1) + ".", 3);
+			} else if (oldVessels[oldVessel.Id].LostOrGainedParts) {
+				addMessage(oldVessel.Name + " lost parts.", 4);
 			}
 		}
 
