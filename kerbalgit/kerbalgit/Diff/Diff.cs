@@ -145,6 +145,11 @@ namespace kerbalgit.Diff {
 		}
 
 		private void compareVessels(Vessel oldVessel, Vessel newVessel) {
+			compareLocations(oldVessel, newVessel);
+			compareStaging(oldVessel, newVessel);			
+		}
+
+		private void compareLocations(Vessel oldVessel, Vessel newVessel) {
 			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
 				addMessage("Launched " + oldVessel.Name + " into " + newVessel.Orbit.GetName(true, true) + ".", 0);
 			}
@@ -152,7 +157,7 @@ namespace kerbalgit.Diff {
 				if (newVessel.CelestialBody == Planetarium.Instance.Value.Kerbin) {
 					addMessage("Launched " + oldVessel.Name + " on Kerbin.", 0);
 				} else {
-					addMessage("Launched " + oldVessel.Name + " and " + newVessel.FlightStateValue.ToString().ToLower() +  " on " + newVessel.CelestialBody.Name + ".", 0);
+					addMessage("Launched " + oldVessel.Name + " and " + newVessel.FlightStateValue.ToString().ToLower() + " on " + newVessel.CelestialBody.Name + ".", 0);
 				}
 			}
 			if (oldVessel.FlightStateValue == Vessel.FlighState.Orbiting && newVessel.FlightStateValue == Vessel.FlighState.Landed) {
@@ -161,7 +166,7 @@ namespace kerbalgit.Diff {
 				} else {
 					addMessage(oldVessel.Name + " travelled from " + oldVessel.Orbit.GetName(true, true) + " to " + newVessel.CelestialBody.Name + " and landed there.", 0);
 				}
-				
+
 			}
 			if (oldVessel.FlightStateValue == Vessel.FlighState.Orbiting && newVessel.FlightStateValue == Vessel.FlighState.Splashed) {
 				if (oldVessel.CelestialBody == newVessel.CelestialBody) {
@@ -172,6 +177,16 @@ namespace kerbalgit.Diff {
 			}
 			if ((oldVessel.FlightStateValue == Vessel.FlighState.Landed || oldVessel.FlightStateValue == Vessel.FlighState.Splashed) && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
 				addMessage(oldVessel.Name + " took off from " + oldVessel.CelestialBody + " and went into " + newVessel.Orbit.GetName(false, true), 0);
+			}
+		}
+
+		private void compareStaging(Vessel oldVessel, Vessel newVessel) {
+			if (oldVessel.Stage == newVessel.Stage + 1) {
+				addMessage(oldVessel.Name + " triggered stage " + oldVessel.Stage + ".", 3);
+			} else if (oldVessel.Stage == newVessel.Stage + 2) {
+				addMessage(oldVessel.Name + " triggered stages " + oldVessel.Stage + " and " + (oldVessel.Stage + 1) + ".", 3);
+			} else if (oldVessel.Stage > newVessel.Stage) {
+				addMessage(oldVessel.Name + " triggered stages " + oldVessel.Stage + " to " + (newVessel.Stage + 1) + ".", 3);
 			}
 		}
 

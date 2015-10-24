@@ -74,5 +74,11 @@ namespace kerbalgit.GameObjects {
 				return Node.GetValue("landedAt");
 			}
 		}
+
+		public int Stage {
+			get {
+				return (int)Node.GetInt("stg");
+			}
+		}
 	}
 }
