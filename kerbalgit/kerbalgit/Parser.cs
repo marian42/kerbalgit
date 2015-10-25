@@ -5,14 +5,18 @@ using System.Linq;
 
 namespace kerbalgit {
 	class Parser {
-		private readonly string filename;
+		private readonly IEnumerable<string> lines;
 		
 		public RootNode Tree { get; private set; }
 
 		private Node currentNode;
 
 		public Parser(string filename) {
-			this.filename = filename;
+			lines = File.ReadAllLines(filename).ToList();			
+		}
+
+		public Parser(IEnumerable<string> lines) {
+			this.lines = lines;
 		}
 
 		public RootNode Parse() {
@@ -20,8 +24,8 @@ namespace kerbalgit {
 				return Tree;
 			}
 
-			var lines = File.ReadAllLines(filename).ToList();
 			var enumerator = (IEnumerator<string>)(lines.GetEnumerator());
+			enumerator.MoveNext();
 
 			Tree = new RootNode(enumerator.Current);
 			currentNode = Tree;
