@@ -18,9 +18,11 @@ namespace kerbalgit.Diff {
 		public Diff(RootNode oldSave, RootNode newSave) {
 			this.oldSave = oldSave;
 			this.newSave = newSave;
+
+			createDiff();
 		}
 
-		public void CreateDiff() {
+		private void createDiff() {
 			parts = new Dictionary<long, OldNew<Part>>();
 			oldVessels = new Dictionary<string, VesselInfo>();
 			newVessels = new Dictionary<string, VesselInfo>();
@@ -195,6 +197,12 @@ namespace kerbalgit.Diff {
 		public string Message {
 			get {
 				return string.Join("\n", commitMessages.OrderBy(message => message.Priority).Select(commitMessage => commitMessage.Message));
+			}
+		}
+
+		public bool AnyChanges {
+			get {
+				return commitMessages.Any();
 			}
 		}
 

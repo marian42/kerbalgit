@@ -1,8 +1,10 @@
 ﻿using kerbalgit.Tree;
 using LibGit2Sharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace kerbalgit.Git {
 	class SaveGameObserver {
@@ -10,6 +12,7 @@ namespace kerbalgit.Git {
 
 		private readonly string folder;
 		private readonly Repository repository;
+		private DateTime lastChanged;
 
 		public SaveGameObserver(string folder) {
 			this.folder = folder;
@@ -35,16 +38,56 @@ namespace kerbalgit.Git {
 			using (var content = new StreamReader(repository.Info.WorkingDirectory + Path.DirectorySeparatorChar + FILENAME, Encoding.UTF8)) {
 				workingContent = content.ReadToEnd();
 			}
-					
-			var diff = new Diff.Diff(parseSavegame(commitContent), parseSavegame(workingContent));
-			diff.CreateDiff();
+			
+			return new Diff.Diff(parseSavegame(commitContent), parseSavegame(workingContent));
+		}
 
-			return diff;
+		private bool FileHasChanged {
+			get {
+				var fileInfo = new FileInfo(folder + FILENAME);
+				return fileInfo.LastWriteTime != lastChanged;
+			}
+		}
+
+		private void setLastChanged() {
+			var fileInfo = new FileInfo(folder + FILENAME);
+			lastChanged = fileInfo.LastWriteTime;
+		}
+
+		public void Commit(string message) {
+			Console.WriteLine("Committing " + Name + ".");
+
+			repository.Stage(FILENAME);
+
+			Signature author = new Signature("Name", "email@example.com", DateTime.Now);
+
+			Commit commit = repository.Commit(message, author, author);
+			setLastChanged();
+		}
+
+		public void Check() {
+			if (!FileHasChanged) {
+				return;
+			}
+			setLastChanged();
+			
+			var diff = createDiff();
+			if (!diff.AnyChanges) {
+				return;
+			}
+
+			Commit(diff.Message);
 		}
 
 		public string CommitMessage {
 			get {
 				return createDiff().Message;
+			}
+		}
+
+		public string Name {
+			get {
+				return folder.Split(Path.DirectorySeparatorChar).Last(s => s.Any());
 			}
 		}
 	}
