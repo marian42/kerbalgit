@@ -37,7 +37,7 @@ namespace kerbalgit.GameObjects {
 
 		public string Name {
 			get {
-				return Node.GetValue("name");
+				return Node.GetValue("name").Substring(0, 1).ToUpper() + Node.GetValue("name").Substring(1);
 			}
 		}
 
