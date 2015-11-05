@@ -97,10 +97,10 @@ namespace kerbalgit.Diff {
 				var jettisonedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => vessel.IsDebris);
 
 				if (undockedShips.Any()) {
-					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name, 0);
+					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name + ".", 0);
 				}
 				if (jettisonedShips.Any()) {
-					addMessage("Jettisoned " + jettisonedShips.Count() + (undockedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name, 0);
+					addMessage("Jettisoned " + jettisonedShips.Count() + (undockedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name + ".", 0);
 				}
 			}
 		}
@@ -110,7 +110,7 @@ namespace kerbalgit.Diff {
 				var motherShip = vesselInfo.CorrespondingVessels.OrderBy(vessel => vessel.Name.Length).First();
 				var dockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip);
 
-				addMessage("Docked " + CommitMessage.Enumerate(dockedShips.Select(vessel => vessel.Name)) + " to " + motherShip.Name, 0);
+				addMessage("Docked " + CommitMessage.Enumerate(dockedShips.Select(vessel => vessel.Name)) + " to " + motherShip.Name + ".", 0);
 			}
 		}
 
@@ -184,7 +184,7 @@ namespace kerbalgit.Diff {
 				}
 			}
 			if ((oldVessel.FlightStateValue == Vessel.FlighState.Landed || oldVessel.FlightStateValue == Vessel.FlighState.Splashed) && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
-				addMessage(oldVessel.Name + " took off from " + oldVessel.CelestialBody + " and went into " + newVessel.Orbit.GetName(false, true), 0);
+				addMessage(oldVessel.Name + " took off from " + oldVessel.CelestialBody + " and went into " + newVessel.Orbit.GetName(false, true) + ".", 0);
 			}
 
 			if (oldVessel.InFlight && newVessel.InFlight && !oldVessel.Orbit.IsSimilar(newVessel.Orbit, true)) {
