@@ -93,9 +93,15 @@ namespace kerbalgit.Diff {
 		private void analyzeUnDocking() {
 			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() > 1)) {
 				var motherShip = vesselInfo.CorrespondingVessels.OrderBy(vessel => vessel.Name.Length).First();
-				var undockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip);
+				var undockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => !vessel.IsDebris);
+				var jettisonedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => vessel.IsDebris);
 
-				addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name, 0);
+				if (undockedShips.Any()) {
+					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name, 0);
+				}
+				if (jettisonedShips.Any()) {
+					addMessage("Jettisoned " + jettisonedShips.Count() + (undockedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name, 0);
+				}
 			}
 		}
 

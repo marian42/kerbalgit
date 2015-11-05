@@ -9,7 +9,10 @@ namespace kerbalgit.GameObjects {
 			Orbiting,
 			Prelaunch,
 			Landed,
-			Splashed
+			Splashed,
+			Sub_Orbital,
+			Flying,
+			Escaping
 		}
 
 		public readonly Node Node;
@@ -60,6 +63,12 @@ namespace kerbalgit.GameObjects {
 		public FlighState FlightStateValue {
 			get {
 				return Enum.GetValues(typeof(Vessel.FlighState)).Cast<Vessel.FlighState>().First(flightState => flightState.ToString().ToLower() == Node.GetValue("sit").ToLower());
+			}
+		}
+
+		public bool IsDebris {
+			get {
+				return Node.GetValue("type") == "Debris";
 			}
 		}
 
