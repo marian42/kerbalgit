@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System.Timers;
 
 namespace kerbalgit.Git {
 	class SaveGameObserver {
@@ -71,12 +72,18 @@ namespace kerbalgit.Git {
 			}
 			setLastChanged();
 			
+			Console.WriteLine("-");
 			var diff = createDiff();
 			if (!diff.AnyChanges) {
 				return;
 			}
 
 			Commit(diff.Message);
+		}
+
+		public void Check(Object source, ElapsedEventArgs e) {
+			Check();
+			Console.Write(".");
 		}
 
 		public string CommitMessage {
