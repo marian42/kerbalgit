@@ -158,7 +158,7 @@ namespace kerbalgit.Diff {
 		}
 
 		private void compareLocations(Vessel oldVessel, Vessel newVessel) {
-			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
+			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && newVessel.InFlight) {
 				addMessage("Launched " + oldVessel.Name + " into " + newVessel.Orbit.GetName(true, true) + ".", 0);
 			}
 			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && (newVessel.FlightStateValue == Vessel.FlighState.Landed && newVessel.FlightStateValue == Vessel.FlighState.Splashed)) {
@@ -168,7 +168,7 @@ namespace kerbalgit.Diff {
 					addMessage("Launched " + oldVessel.Name + " and " + newVessel.FlightStateValue.ToString().ToLower() + " on " + newVessel.CelestialBody.Name + ".", 0);
 				}
 			}
-			if (oldVessel.FlightStateValue == Vessel.FlighState.Orbiting && newVessel.FlightStateValue == Vessel.FlighState.Landed) {
+			if (oldVessel.InFlight && newVessel.FlightStateValue == Vessel.FlighState.Landed) {
 				if (oldVessel.CelestialBody == newVessel.CelestialBody) {
 					addMessage("Landed " + oldVessel.Name + " on " + newVessel.CelestialBody.Name + ".", 0);
 				} else {
@@ -176,7 +176,7 @@ namespace kerbalgit.Diff {
 				}
 
 			}
-			if (oldVessel.FlightStateValue == Vessel.FlighState.Orbiting && newVessel.FlightStateValue == Vessel.FlighState.Splashed) {
+			if (oldVessel.InFlight && newVessel.FlightStateValue == Vessel.FlighState.Splashed) {
 				if (oldVessel.CelestialBody == newVessel.CelestialBody) {
 					addMessage(oldVessel.Name + " splashed down on " + newVessel.CelestialBody.Name + ".", 0);
 				} else {
@@ -185,6 +185,10 @@ namespace kerbalgit.Diff {
 			}
 			if ((oldVessel.FlightStateValue == Vessel.FlighState.Landed || oldVessel.FlightStateValue == Vessel.FlighState.Splashed) && newVessel.FlightStateValue == Vessel.FlighState.Orbiting) {
 				addMessage(oldVessel.Name + " took off from " + oldVessel.CelestialBody + " and went into " + newVessel.Orbit.GetName(false, true), 0);
+			}
+
+			if (oldVessel.InFlight && newVessel.InFlight && !oldVessel.Orbit.IsSimilar(newVessel.Orbit, true)) {
+				addMessage(oldVessel.Name + " changed from " + oldVessel.Orbit.GetName(true, true) + " to " + newVessel.Orbit.GetName(oldVessel.CelestialBody != newVessel.CelestialBody, true) + ".", 0);
 			}
 		}
 

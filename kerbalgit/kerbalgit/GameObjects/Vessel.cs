@@ -66,6 +66,12 @@ namespace kerbalgit.GameObjects {
 			}
 		}
 
+		public bool InFlight {
+			get {
+				return FlightStateValue == FlighState.Escaping || FlightStateValue == FlighState.Orbiting || FlightStateValue == FlighState.Sub_Orbital;
+			}
+		}
+
 		public bool IsDebris {
 			get {
 				return Node.GetValue("type") == "Debris";
