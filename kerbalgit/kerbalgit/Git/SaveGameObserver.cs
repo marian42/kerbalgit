@@ -72,7 +72,7 @@ namespace kerbalgit.Git {
 			}
 			setLastChanged();
 			
-			Console.WriteLine("-");
+			Console.WriteLine("Reading " + Name + "...");
 			var diff = createDiff();
 			if (!diff.AnyChanges) {
 				return;
