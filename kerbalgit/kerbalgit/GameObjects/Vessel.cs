@@ -15,6 +15,16 @@ namespace kerbalgit.GameObjects {
 			Escaping
 		}
 
+		public enum DiscoveryLevel {
+			Owned = -1,
+			None = 0,
+			Presence = 1,
+			Name = 4,
+			StateVectors = 8,
+			Appearance = 16,
+			Unowned = 29,
+		}
+
 		public readonly Node Node;
 		public readonly List<Part> parts;
 		public readonly Orbit Orbit;
@@ -93,6 +103,19 @@ namespace kerbalgit.GameObjects {
 		public int Stage {
 			get {
 				return (int)Node.GetInt("stg");
+			}
+		}
+
+		public DiscoveryLevel DiscoveryLevelValue {
+			get {
+				var i = (int)Node.GetInt("discovery/state");
+				return Enum.GetValues(typeof(Vessel.DiscoveryLevel)).Cast<Vessel.DiscoveryLevel>().First(level => (int)level == i);  
+			}
+		}
+
+		public bool Owned {
+			get {
+				return DiscoveryLevelValue == DiscoveryLevel.Owned;
 			}
 		}
 	}
