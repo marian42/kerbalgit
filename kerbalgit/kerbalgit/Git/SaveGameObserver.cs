@@ -34,13 +34,28 @@ namespace kerbalgit.Git {
 				commitContent = content.ReadToEnd();
 			}
 
-			var patch = repository.Diff.Compare<Patch>(new List<string>() { FILENAME });
 			string workingContent;
 			using (var content = new StreamReader(repository.Info.WorkingDirectory + Path.DirectorySeparatorChar + FILENAME, Encoding.UTF8)) {
 				workingContent = content.ReadToEnd();
 			}
 			
 			return new Diff.Diff(parseSavegame(commitContent), parseSavegame(workingContent));
+		}
+
+		public Diff.Diff createDiff(string commitHash) {
+			var commit = repository.Lookup<Commit>(commitHash);
+
+			string newSavefile;
+			using (var content = new StreamReader((commit[FILENAME].Target as Blob).GetContentStream(), Encoding.UTF8)) {
+				newSavefile = content.ReadToEnd();
+			}
+
+			string oldSavefile;
+			using (var content = new StreamReader((commit.Parents.First()[FILENAME].Target as Blob).GetContentStream(), Encoding.UTF8)) {
+				oldSavefile = content.ReadToEnd();
+			}
+
+			return new Diff.Diff(parseSavegame(oldSavefile), parseSavegame(newSavefile));
 		}
 
 		private bool FileHasChanged {

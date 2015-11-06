@@ -4,8 +4,7 @@ using System.Linq;
 
 namespace kerbalgit {
 	class Test {
-		static void Main(string[] args) {
-			var observer = new SaveGameObserver(@"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\saves\1_0-career\");
+		private static void observeSavegame(SaveGameObserver observer) {
 			Console.WriteLine("Observing " + observer.Name + "...");
 			observer.Check();
 
@@ -13,6 +12,19 @@ namespace kerbalgit {
 			timer.Elapsed += observer.Check;
 			timer.AutoReset = true;
 			timer.Enabled = true;
+		}
+
+		private static void createMessage(SaveGameObserver observer, string commitHash) {
+			var diff = observer.createDiff(commitHash);
+			Console.WriteLine(diff.Message);
+		}
+
+		static void Main(string[] args) {
+			var observer = new SaveGameObserver(@"C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\saves\fueltest\");
+			
+			//observeSavegame(observer);
+
+			createMessage(observer, "66ee600");		
 
 			Console.ReadLine();
 		}
