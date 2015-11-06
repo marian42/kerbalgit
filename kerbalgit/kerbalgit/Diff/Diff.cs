@@ -154,7 +154,11 @@ namespace kerbalgit.Diff {
 
 		private void compareVessels(Vessel oldVessel, Vessel newVessel) {
 			compareLocations(oldVessel, newVessel);
-			compareStaging(oldVessel, newVessel);			
+			compareStaging(oldVessel, newVessel);
+
+			if (!oldVessel.Owned && newVessel.Owned) {
+				addMessage("Took ownership of " + newVessel.Name + ".", 2);
+			}
 		}
 
 		private void compareLocations(Vessel oldVessel, Vessel newVessel) {
