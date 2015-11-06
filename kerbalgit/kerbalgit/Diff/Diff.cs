@@ -97,10 +97,10 @@ namespace kerbalgit.Diff {
 				var jettisonedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => vessel.IsDebris);
 
 				if (undockedShips.Any()) {
-					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name + ".", 0);
+					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name + ".", 1);
 				}
 				if (jettisonedShips.Any()) {
-					addMessage("Jettisoned " + jettisonedShips.Count() + (undockedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name + ".", 0);
+					addMessage("Jettisoned " + jettisonedShips.Count() + (undockedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name + ".", 4);
 				}
 			}
 		}
