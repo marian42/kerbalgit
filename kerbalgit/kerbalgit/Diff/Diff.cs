@@ -100,7 +100,7 @@ namespace kerbalgit.Diff {
 					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name + ".", 1);
 				}
 				if (jettisonedShips.Any()) {
-					addMessage("Jettisoned " + jettisonedShips.Count() + (undockedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name + ".", 4);
+					addMessage("Jettisoned " + jettisonedShips.Count() + (jettisonedShips.Count() == 1 ? " chunk " : " chunks ") + "from " + motherShip.Name + ".", 4);
 				}
 			}
 		}
