@@ -15,6 +15,8 @@ namespace kerbalgit.Git {
 		private readonly Repository repository;
 		private DateTime lastChanged;
 
+		private Timer timer;
+
 		public SaveGameObserver(string folder) {
 			this.folder = folder;
 			this.repository = new Repository(folder);
@@ -82,6 +84,8 @@ namespace kerbalgit.Git {
 		}
 
 		public void Check() {
+			Console.Write(".");
+
 			if (!FileHasChanged) {
 				return;
 			}
@@ -98,7 +102,6 @@ namespace kerbalgit.Git {
 
 		public void Check(Object source, ElapsedEventArgs e) {
 			Check();
-			Console.Write(".");
 		}
 
 		public string CommitMessage {
@@ -111,6 +114,18 @@ namespace kerbalgit.Git {
 			get {
 				return folder.Split(Path.DirectorySeparatorChar).Last(s => s.Any());
 			}
+		}
+
+		public void StartObserving() {
+			Console.WriteLine("Observing " + Name + "...");
+			Check();
+
+			if (timer == null) {
+				timer = new System.Timers.Timer(10000);
+			}
+			timer.Elapsed += Check;
+			timer.AutoReset = true;
+			timer.Enabled = true;
 		}
 	}
 }
