@@ -158,8 +158,8 @@ namespace kerbalgit.GameObjects {
 			return result;
 		}
 
-		public bool IsSimilar(Orbit orbit, bool compareAltitudeNumerically) {
-			return (!compareAltitudeNumerically || Math.Abs(MinAltitude - orbit.MinAltitude) < 15000)
+		public bool IsSimilar(Orbit orbit) {
+			return (NamedEccentricityValue != NamedEccentricity.Circular || orbit.NamedEccentricityValue == NamedEccentricity.Circular || Math.Abs(MinAltitude - orbit.MinAltitude) < 15000)
 				&& NamedEccentricityValue == orbit.NamedEccentricityValue
 				&& NamedInclinationValue == orbit.NamedInclinationValue
 				&& NamedSemiMajorAxisValue == orbit.NamedSemiMajorAxisValue;

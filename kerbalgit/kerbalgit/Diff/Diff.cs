@@ -116,7 +116,7 @@ namespace kerbalgit.Diff {
 
 		private void trackLostAndFoundShips() {
 			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() == 0 && vesselInfo.Vessel.Owned)) {
-				if (vesselInfo.Vessel.CelestialBody == Planetarium.Instance.Value.Kerbin && vesselInfo.Vessel.FlightStateValue != Vessel.FlighState.Orbiting) {
+				if (vesselInfo.Vessel.CelestialBody == Planetarium.Instance.Value.Kerbin && !vesselInfo.Vessel.InFlight) {
 					addMessage("Recovered " + vesselInfo.Vessel.Name + ".", 2);
 				} else {
 					addMessage("Lost track of " + vesselInfo.Vessel.Name + " (probably recovered).", 2);
@@ -191,7 +191,7 @@ namespace kerbalgit.Diff {
 				addMessage(oldVessel.Name + " took off from " + oldVessel.CelestialBody + " and went into " + newVessel.Orbit.GetName(false, true) + ".", 0);
 			}
 
-			if (oldVessel.InFlight && newVessel.InFlight && !oldVessel.Orbit.IsSimilar(newVessel.Orbit, true) && newVessel.Owned) {
+			if (oldVessel.InFlight && newVessel.InFlight && !oldVessel.Orbit.IsSimilar(newVessel.Orbit) && newVessel.Owned) {
 				addMessage(oldVessel.Name + " changed from " + oldVessel.Orbit.GetName(true, true) + " to " + newVessel.Orbit.GetName(oldVessel.CelestialBody != newVessel.CelestialBody, true) + ".", 0);
 			}
 		}
