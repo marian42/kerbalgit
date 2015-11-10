@@ -1,15 +1,15 @@
 ﻿using kerbalgit.Tree;
 using LibGit2Sharp;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Linq;
 using System.Timers;
+using System.Linq;
 
 namespace kerbalgit.Git {
 	class SaveGameObserver {
 		private const string FILENAME = "persistent.sfs";
+		private const string BRANCH_NAME_PREFIX = "reverted-mission-";
 
 		private readonly string folder;
 		private readonly Repository repository;
@@ -22,31 +22,47 @@ namespace kerbalgit.Git {
 			this.repository = new Repository(folder);
 		}
 
-		private RootNode parseSavegame(string content) {
+		private static double getTime(RootNode saveGame) {
+			return saveGame.GetDouble("flightstate/UT");
+		}
+
+		private static RootNode parseSavegame(string content) {
 			var lines = content.Split('\n');
 			var parser = new Parser(lines);
 			var rootNode = parser.Parse();
 			return rootNode;
 		}
 
-		private Diff.Diff createDiff() {
-			var blob = repository.Head.Tip[FILENAME].Target as Blob;
+		private static RootNode getSavegame(Commit commit) {
+			var blob = commit[FILENAME].Target as Blob;
+
 			string commitContent;
 			using (var content = new StreamReader(blob.GetContentStream(), Encoding.UTF8)) {
 				commitContent = content.ReadToEnd();
 			}
 
+			return parseSavegame(commitContent);
+		}
+
+		private Diff.Diff createDiff() {
 			string workingContent;
 			using (var content = new StreamReader(repository.Info.WorkingDirectory + Path.DirectorySeparatorChar + FILENAME, Encoding.UTF8)) {
 				workingContent = content.ReadToEnd();
 			}
+
+			var newSavegame = parseSavegame(workingContent);
+			var parentCommit = findLatestCommitBefore(getTime(newSavegame));
+			var oldSavegame = getSavegame(parentCommit);
 			
-			return new Diff.Diff(parseSavegame(commitContent), parseSavegame(workingContent));
+			return new Diff.Diff(oldSavegame, newSavegame, parentCommit);
 		}
 
 		public Diff.Diff createDiff(string commitHash) {
 			var commit = repository.Lookup<Commit>(commitHash);
+			return createDiff(commit);
+		}
 
+		public Diff.Diff createDiff(Commit commit) {
 			string newSavefile;
 			using (var content = new StreamReader((commit[FILENAME].Target as Blob).GetContentStream(), Encoding.UTF8)) {
 				newSavefile = content.ReadToEnd();
@@ -58,6 +74,18 @@ namespace kerbalgit.Git {
 			}
 
 			return new Diff.Diff(parseSavegame(oldSavefile), parseSavegame(newSavefile));
+		}
+
+		private Commit findLatestCommitBefore(double currentTime) {
+			var commit = repository.Head.Tip;
+			var commitTime = getTime(getSavegame(commit));
+
+			while (commitTime > currentTime) {
+				commit = commit.Parents.First();
+				commitTime = getTime(getSavegame(commit));
+			}
+
+			return commit;
 		}
 
 		private bool FileHasChanged {
@@ -72,14 +100,39 @@ namespace kerbalgit.Git {
 			lastChanged = fileInfo.LastWriteTime;
 		}
 
-		public void Commit(string message) {
+		/// <summary>
+		/// Creates a new branch for the current head (reverted mission)
+		/// and sets the previous branch (main mission) to the supplied commit
+		/// </summary>
+		private void safelyCheckoutCommit(Commit commit) {
+			if (commit == repository.Head.Tip) {
+				throw new InvalidOperationException("HEAD already points at this commit.");
+			}
+
+			var mainBranch = repository.Head;
+
+			var branchNameIndex = 1;
+			while (repository.Branches.Any(branch => branch.Name == BRANCH_NAME_PREFIX + branchNameIndex)) {
+				branchNameIndex++;
+			}
+
+			repository.CreateBranch(BRANCH_NAME_PREFIX + branchNameIndex);
+			repository.Refs.UpdateTarget(repository.Refs.Head, commit.Id);
+			repository.Refs.UpdateTarget(mainBranch.CanonicalName, commit.Sha);
+		}
+
+		public void Commit(Diff.Diff diff) {
+			if (diff.Commit != null && diff.Commit != repository.Head.Tip) {
+				safelyCheckoutCommit(diff.Commit);
+			}
+
 			Console.WriteLine("Committing " + Name + ".");
 
 			repository.Stage(FILENAME);
 
 			Signature author = new Signature("Name", "email@example.com", DateTime.Now);
 
-			Commit commit = repository.Commit(message, author, author);
+			Commit commit = repository.Commit(diff.Message, author, author);
 			setLastChanged();
 		}
 
@@ -97,7 +150,7 @@ namespace kerbalgit.Git {
 				return;
 			}
 
-			Commit(diff.Message);
+			Commit(diff);
 		}
 
 		public void Check(Object source, ElapsedEventArgs e) {

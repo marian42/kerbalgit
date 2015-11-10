@@ -1,5 +1,6 @@
 ﻿using kerbalgit.GameObjects;
 using kerbalgit.Tree;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,11 +16,17 @@ namespace kerbalgit.Diff {
 
 		private List<CommitMessage> commitMessages;
 
+		public readonly Commit Commit;
+
 		public Diff(RootNode oldSave, RootNode newSave) {
 			this.oldSave = oldSave;
 			this.newSave = newSave;
 
 			createDiff();
+		}
+
+		public Diff(RootNode oldSave, RootNode newSave, Commit commit) : this(oldSave, newSave) {
+			Commit = commit;
 		}
 
 		private void createDiff() {
