@@ -1,4 +1,5 @@
-﻿using kerbalgit.Tree;
+﻿using kerbalgit.GameObjects;
+using kerbalgit.Tree;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,5 +52,12 @@ namespace kerbalgit {
 				currentNode = new Node(line.ToLower(), currentNode);
 			}
 		}
+
+		public static Savegame ParseSavegame(string content) {
+			var lines = content.Split('\n');
+			var parser = new Parser(lines);
+			var rootNode = parser.Parse();
+			return new Savegame(rootNode);
+		}		
 	}
 }

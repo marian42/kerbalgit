@@ -1,5 +1,4 @@
-﻿using kerbalgit.Tree;
-using LibGit2Sharp;
+﻿using LibGit2Sharp;
 using System;
 using System.IO;
 using System.Text;
@@ -24,13 +23,6 @@ namespace kerbalgit.Git {
 			this.repository = new Repository(folder);
 		}
 
-		private static Savegame parseSavegame(string content) {
-			var lines = content.Split('\n');
-			var parser = new Parser(lines);
-			var rootNode = parser.Parse();
-			return new Savegame(rootNode);
-		}
-
 		private static Savegame getSavegame(Commit commit) {
 			var blob = commit[FILENAME].Target as Blob;
 
@@ -39,28 +31,32 @@ namespace kerbalgit.Git {
 				commitContent = content.ReadToEnd();
 			}
 
-			return parseSavegame(commitContent);
+			return Parser.ParseSavegame(commitContent);
 		}
 
-		private Diff.Diff createDiff() {
+		private Savegame getWorkingContentSavegame() {
 			string workingContent;
 			using (var content = new StreamReader(repository.Info.WorkingDirectory + Path.DirectorySeparatorChar + FILENAME, Encoding.UTF8)) {
 				workingContent = content.ReadToEnd();
 			}
 
-			var newSavegame = parseSavegame(workingContent);
+			return Parser.ParseSavegame(workingContent);
+		}
+
+		private Diff.Diff createDiff() {
+			var newSavegame = getWorkingContentSavegame();
 			var parentCommit = findLatestCommitBefore(newSavegame.Time);
 			var oldSavegame = getSavegame(parentCommit);
 			
 			return new Diff.Diff(oldSavegame, newSavegame, parentCommit);
 		}
 
-		public Diff.Diff createDiff(string commitHash) {
+		public Diff.Diff CreateDiff(string commitHash) {
 			var commit = repository.Lookup<Commit>(commitHash);
-			return createDiff(commit);
+			return CreateDiff(commit);
 		}
 
-		public Diff.Diff createDiff(Commit commit) {
+		public Diff.Diff CreateDiff(Commit commit) {
 			string newSavefile;
 			using (var content = new StreamReader((commit[FILENAME].Target as Blob).GetContentStream(), Encoding.UTF8)) {
 				newSavefile = content.ReadToEnd();
@@ -71,7 +67,7 @@ namespace kerbalgit.Git {
 				oldSavefile = content.ReadToEnd();
 			}
 
-			return new Diff.Diff(parseSavegame(oldSavefile), parseSavegame(newSavefile));
+			return new Diff.Diff(Parser.ParseSavegame(oldSavefile), Parser.ParseSavegame(newSavefile));
 		}
 
 		private Commit findLatestCommitBefore(double currentTime) {
@@ -86,7 +82,7 @@ namespace kerbalgit.Git {
 			return commit;
 		}
 
-		private bool FileHasChanged {
+		private bool fileHasChanged {
 			get {
 				var fileInfo = new FileInfo(folder + FILENAME);
 				return fileInfo.LastWriteTime != lastChanged;
@@ -137,7 +133,7 @@ namespace kerbalgit.Git {
 		public void Check() {
 			Console.Write(".");
 
-			if (!FileHasChanged) {
+			if (!fileHasChanged) {
 				return;
 			}
 			setLastChanged();
@@ -201,7 +197,7 @@ namespace kerbalgit.Git {
 			repository.Refs.RewriteHistory(new RewriteHistoryOptions {
 				BackupRefsNamespace = "backup/" + Guid.NewGuid().GetHashCode(),
 				CommitHeaderRewriter = c =>
-					CommitRewriteInfo.From(c, message: c.Parents.Any() ? createDiff(c).Message : c.Message),
+					CommitRewriteInfo.From(c, message: c.Parents.Any() ? CreateDiff(c).Message : c.Message),
 			}, getAllCommits());
 
 			Console.WriteLine("Rewriting commit messages complete.");
