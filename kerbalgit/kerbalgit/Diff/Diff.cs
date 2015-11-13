@@ -90,6 +90,7 @@ namespace kerbalgit.Diff {
 			analyzeDocking();
 			trackLostAndFoundShips();
 			compareVessels();
+			analyzeTechTree();
 		}
 
 		private void analyzeUnDocking() {
@@ -247,6 +248,13 @@ namespace kerbalgit.Diff {
 
 		public IReadOnlyCollection<Vessel> GetNewVessels() {
 			return newVessels.Values.Select(info => info.Vessel).ToList().AsReadOnly();
-		}		
+		}
+
+		private void analyzeTechTree() {
+			var newTech = newSave.ResearchedTech.Where(tech => !oldSave.ResearchedTech.Contains(tech));
+			if (newTech.Any()) {
+				addMessage("Researched " + CommitMessage.Enumerate(newTech.Select(item => item.Name)) + ".", 2);
+			}
+		}
 	}
 }
