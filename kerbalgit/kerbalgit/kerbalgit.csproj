@@ -53,6 +53,7 @@
     <Compile Include="GameObjects\CelestialBody.cs" />
     <Compile Include="GameObjects\Orbit.cs" />
     <Compile Include="GameObjects\Planetarium.cs" />
+    <Compile Include="GameObjects\Savegame.cs" />
     <Compile Include="Git\SaveGameObserver.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="GameObjects\Part.cs" />

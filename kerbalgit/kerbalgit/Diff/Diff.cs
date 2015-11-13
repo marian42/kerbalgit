@@ -7,8 +7,8 @@ using System.Linq;
 
 namespace kerbalgit.Diff {
 	public class Diff {
-		private readonly RootNode oldSave;
-		private readonly RootNode newSave;
+		private readonly Savegame oldSave;
+		private readonly Savegame newSave;
 		private Dictionary<long, OldNew<Part>> parts;
 
 		private Dictionary<string, VesselInfo> oldVessels;
@@ -18,14 +18,14 @@ namespace kerbalgit.Diff {
 
 		public readonly Commit Commit;
 
-		public Diff(RootNode oldSave, RootNode newSave) {
+		public Diff(Savegame oldSave, Savegame newSave) {
 			this.oldSave = oldSave;
 			this.newSave = newSave;
 
 			createDiff();
 		}
 
-		public Diff(RootNode oldSave, RootNode newSave, Commit commit) : this(oldSave, newSave) {
+		public Diff(Savegame oldSave, Savegame newSave, Commit commit) : this(oldSave, newSave) {
 			Commit = commit;
 		}
 
@@ -33,28 +33,23 @@ namespace kerbalgit.Diff {
 			parts = new Dictionary<long, OldNew<Part>>();
 			oldVessels = new Dictionary<string, VesselInfo>();
 			newVessels = new Dictionary<string, VesselInfo>();
+
+			foreach (var vessel in oldSave.Vessels) {
+				analyzeVessel(vessel, true);
+			}
+			foreach (var vessel in newSave.Vessels) {
+				analyzeVessel(vessel, false);
+			}
 						
-			findVessels(true);
-			findVessels(false);
 			matchParts();
 			createCommitMessages();
 		}
 
-		private RootNode getSave(bool old) {
+		private Savegame getSave(bool old) {
 			return old ? oldSave : newSave;
-		}
+		}		
 
-		private void findVessels(bool old) {
-			var save = getSave(old);
-
-			var flightstateNode = save.Get("flightstate") as Node;
-
-			foreach (var node in flightstateNode.Children.OfType<Node>().Where(node => node.Name == "vessel")) {
-				addVessel(new Vessel(node as Node), old);
-			}
-		}
-
-		private void addVessel(Vessel vessel, bool old) {
+		private void analyzeVessel(Vessel vessel, bool old) {
 			var vesselDict = old ? oldVessels : newVessels;
 
 			vesselDict[vessel.Id] = new VesselInfo(vessel);

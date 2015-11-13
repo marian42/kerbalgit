@@ -6,6 +6,7 @@ using System.Text;
 using System.Timers;
 using System.Linq;
 using System.Collections.Generic;
+using kerbalgit.GameObjects;
 
 namespace kerbalgit.Git {
 	class SaveGameObserver {
@@ -23,18 +24,14 @@ namespace kerbalgit.Git {
 			this.repository = new Repository(folder);
 		}
 
-		private static double getTime(RootNode saveGame) {
-			return saveGame.GetDouble("flightstate/UT");
-		}
-
-		private static RootNode parseSavegame(string content) {
+		private static Savegame parseSavegame(string content) {
 			var lines = content.Split('\n');
 			var parser = new Parser(lines);
 			var rootNode = parser.Parse();
-			return rootNode;
+			return new Savegame(rootNode);
 		}
 
-		private static RootNode getSavegame(Commit commit) {
+		private static Savegame getSavegame(Commit commit) {
 			var blob = commit[FILENAME].Target as Blob;
 
 			string commitContent;
@@ -52,7 +49,7 @@ namespace kerbalgit.Git {
 			}
 
 			var newSavegame = parseSavegame(workingContent);
-			var parentCommit = findLatestCommitBefore(getTime(newSavegame));
+			var parentCommit = findLatestCommitBefore(newSavegame.Time);
 			var oldSavegame = getSavegame(parentCommit);
 			
 			return new Diff.Diff(oldSavegame, newSavegame, parentCommit);
@@ -79,11 +76,11 @@ namespace kerbalgit.Git {
 
 		private Commit findLatestCommitBefore(double currentTime) {
 			var commit = repository.Head.Tip;
-			var commitTime = getTime(getSavegame(commit));
+			var commitTime = getSavegame(commit).Time;
 
 			while (commitTime > currentTime) {
 				commit = commit.Parents.First();
-				commitTime = getTime(getSavegame(commit));
+				commitTime = getSavegame(commit).Time;
 			}
 
 			return commit;
