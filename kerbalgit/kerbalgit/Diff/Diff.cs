@@ -100,8 +100,8 @@ namespace kerbalgit.Diff {
 		private void analyzeUnDocking() {
 			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() > 1)) {
 				var motherShip = vesselInfo.CorrespondingVessels.OrderBy(vessel => vessel.Name.Length).First();
-				var undockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => !vessel.IsDebris);
-				var jettisonedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => vessel.IsDebris);
+				var undockedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => vessel.Type != Vessel.VesselType.Debris);
+				var jettisonedShips = vesselInfo.CorrespondingVessels.Where(vessel => vessel != motherShip).Where(vessel => vessel.Type == Vessel.VesselType.Debris);
 
 				if (undockedShips.Any()) {
 					addMessage("Undocked " + CommitMessage.Enumerate(undockedShips.Select(vessel => vessel.Name)) + " from " + motherShip.Name + ".", 1);
@@ -123,24 +123,39 @@ namespace kerbalgit.Diff {
 
 		private void trackLostAndFoundShips() {
 			foreach (var vesselInfo in oldVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() == 0 && vesselInfo.Vessel.Owned)) {
-				if (vesselInfo.Vessel.CelestialBody == Planetarium.Instance.Value.Kerbin && !vesselInfo.Vessel.InFlight) {
-					addMessage("Recovered " + vesselInfo.Vessel.Name + ".", 2);
-				} else {
-					addMessage("Lost track of " + vesselInfo.Vessel.Name + " (probably recovered).", 2);
+				switch (vesselInfo.Vessel.Type) {
+					case Vessel.VesselType.EVA:
+						addMessage(vesselInfo.Vessel.Name + " completed their EVA.", 1);
+						break;
+					case Vessel.VesselType.Debris: break;
+					case Vessel.VesselType.Asteroid: break;
+					default:
+						if (vesselInfo.Vessel.CelestialBody == Planetarium.Instance.Value.Kerbin && !vesselInfo.Vessel.InFlight) {
+							addMessage("Recovered " + vesselInfo.Vessel.Name + ".", 2);
+						} else {
+							addMessage("Lost track of " + vesselInfo.Vessel.Name + " (probably recovered).", 2);
+						}
+						break;
 				}
 			}
 
 			foreach (var vesselInfo in newVessels.Values.Where(vesselInfo => vesselInfo.CorrespondingVessels.Count() == 0 && vesselInfo.Vessel.Owned)) {
-				switch (vesselInfo.Vessel.FlightStateValue) {
-					case Vessel.FlighState.Prelaunch:
-						addMessage("Put " + vesselInfo.Vessel.Name + " on the " + vesselInfo.Vessel.Location.ToLower() + ".", 0); break;
-					case Vessel.FlighState.Landed:
-						addMessage("Launched " + vesselInfo.Vessel.Name + " and landed on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
-					case Vessel.FlighState.Splashed:
-						addMessage("Launched " + vesselInfo.Vessel.Name + " and splashed down on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
-					case Vessel.FlighState.Orbiting:
-						addMessage("Launched " + vesselInfo.Vessel.Name + " into " + vesselInfo.Vessel.Orbit.GetName(true, true), 0); break;
-					default: throw new NotImplementedException(vesselInfo.Vessel.FlightStateValue.ToString());
+				if (vesselInfo.Vessel.Type == Vessel.VesselType.Flag) {
+					addMessage("Planted flag on " + vesselInfo.Vessel.CelestialBody + ": \"" + vesselInfo.Vessel.Name + "\".", 1);
+				} else if (vesselInfo.Vessel.Type == Vessel.VesselType.EVA) {
+					addMessage(vesselInfo.Vessel.Name + " went on an EVA while " + vesselInfo.Vessel.Location + ".", 1);
+				} else {
+					switch (vesselInfo.Vessel.FlightStateValue) {
+						case Vessel.FlighState.Prelaunch:
+							addMessage("Put " + vesselInfo.Vessel.Name + " on the " + vesselInfo.Vessel.Node.GetValue("landedAt").ToLower() + ".", 0); break;
+						case Vessel.FlighState.Landed:
+							addMessage("Launched " + vesselInfo.Vessel.Name + " and landed on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
+						case Vessel.FlighState.Splashed:
+							addMessage("Launched " + vesselInfo.Vessel.Name + " and splashed down on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
+						case Vessel.FlighState.Orbiting:
+							addMessage("Launched " + vesselInfo.Vessel.Name + " into " + vesselInfo.Vessel.Orbit.GetName(true, true) + ".", 0); break;
+						default: throw new NotImplementedException(vesselInfo.Vessel.FlightStateValue.ToString());
+					}
 				}
 			}
 		}
@@ -169,6 +184,10 @@ namespace kerbalgit.Diff {
 		}
 
 		private void compareLocations(Vessel oldVessel, Vessel newVessel) {
+			if (newVessel.Type == Vessel.VesselType.Debris || newVessel.Type == Vessel.VesselType.Asteroid) {
+				return;
+			}
+
 			if (oldVessel.FlightStateValue == Vessel.FlighState.Prelaunch && newVessel.InFlight) {
 				addMessage("Launched " + oldVessel.Name + " into " + newVessel.Orbit.GetName(true, true) + ".", 0);
 			}
@@ -176,7 +195,7 @@ namespace kerbalgit.Diff {
 				if (newVessel.CelestialBody == Planetarium.Instance.Value.Kerbin) {
 					addMessage("Launched " + oldVessel.Name + " on Kerbin.", 0);
 				} else {
-					addMessage("Launched " + oldVessel.Name + " and " + newVessel.FlightStateValue.ToString().ToLower() + " on " + newVessel.CelestialBody.Name + ".", 0);
+					addMessage("Launched " + oldVessel.Name + " and " + newVessel.FlightStateValue.ToString().ToLower() + " on " + newVessel.CelestialBody + ".", 0);
 				}
 			}
 			if (oldVessel.InFlight && newVessel.FlightStateValue == Vessel.FlighState.Landed) {

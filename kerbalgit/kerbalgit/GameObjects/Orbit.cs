@@ -85,7 +85,7 @@ namespace kerbalgit.GameObjects {
 
 		public NamedSemiMajorAxis NamedSemiMajorAxisValue {
 			get {
-				if (SemiMajorAxis > CelestialBody.SphereOfInfluence) {
+				if (SemiMajorAxis > CelestialBody.SphereOfInfluence || SemiMajorAxis < 0) {
 					return NamedSemiMajorAxis.Escape;
 				} else if (SemiMinorAxis < CelestialBody.Radius) {
 					return NamedSemiMajorAxis.Impact;
@@ -162,7 +162,8 @@ namespace kerbalgit.GameObjects {
 			return (NamedEccentricityValue != NamedEccentricity.Circular || orbit.NamedEccentricityValue == NamedEccentricity.Circular || Math.Abs(MinAltitude - orbit.MinAltitude) < 15000)
 				&& NamedEccentricityValue == orbit.NamedEccentricityValue
 				&& NamedInclinationValue == orbit.NamedInclinationValue
-				&& NamedSemiMajorAxisValue == orbit.NamedSemiMajorAxisValue;
+				&& NamedSemiMajorAxisValue == orbit.NamedSemiMajorAxisValue
+				&& CelestialBody == orbit.CelestialBody;
 		}
 
 		public override string ToString() {

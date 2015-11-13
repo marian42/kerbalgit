@@ -15,6 +15,17 @@ namespace kerbalgit.GameObjects {
 			Escaping
 		}
 
+		public enum VesselType {
+			Ship,
+			Probe,
+			Lander,
+			Flag,
+			Debris,
+			Asteroid,
+			EVA,
+			SpaceObject
+		}
+
 		public enum DiscoveryLevel {
 			Owned = -1,
 			None = 0,
@@ -72,7 +83,13 @@ namespace kerbalgit.GameObjects {
 
 		public FlighState FlightStateValue {
 			get {
-				return Enum.GetValues(typeof(Vessel.FlighState)).Cast<Vessel.FlighState>().First(flightState => flightState.ToString().ToLower() == Node.GetValue("sit").ToLower());
+				try {
+					return Enum.GetValues(typeof(Vessel.FlighState)).Cast<Vessel.FlighState>().First(flightState => flightState.ToString().ToLower() == Node.GetValue("sit").ToLower());
+				}
+				catch (InvalidOperationException) {
+					throw new NotImplementedException("Unknown flight state: " + Node.GetValue("type"));
+				}	
+
 			}
 		}
 
@@ -82,9 +99,14 @@ namespace kerbalgit.GameObjects {
 			}
 		}
 
-		public bool IsDebris {
+		public VesselType Type {
 			get {
-				return Node.GetValue("type") == "Debris";
+				try {
+					return Enum.GetValues(typeof(Vessel.VesselType)).Cast<Vessel.VesselType>().First(vesselType => vesselType.ToString().ToLower() == Node.GetValue("type").ToLower());
+				}
+				catch (InvalidOperationException) {
+					throw new NotImplementedException("Unknown vessel type: " + Node.GetValue("type"));
+				}				
 			}
 		}
 
@@ -96,7 +118,23 @@ namespace kerbalgit.GameObjects {
 
 		public string Location {
 			get {
-				return Node.GetValue("landedAt");
+				switch (FlightStateValue) {
+					case FlighState.Escaping:
+						return "escaping from " + CelestialBody;
+					case FlighState.Flying:
+						return "flying over " + CelestialBody;
+					case FlighState.Landed:
+						return "landed on " + CelestialBody;
+					case FlighState.Orbiting:
+						return "orbiting around " + CelestialBody;
+					case FlighState.Prelaunch:
+						return "in preparation of launch";
+					case FlighState.Splashed:
+						return "splashed down on " + CelestialBody;
+					case FlighState.Sub_Orbital:
+						return "on a suborbital trajectory above " + CelestialBody;
+					default: throw new NotImplementedException(FlightStateValue.ToString());
+				}
 			}
 		}
 
@@ -117,6 +155,10 @@ namespace kerbalgit.GameObjects {
 			get {
 				return DiscoveryLevelValue == DiscoveryLevel.Owned;
 			}
+		}
+
+		public override string ToString() {
+			return Name;
 		}
 	}
 }

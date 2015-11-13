@@ -18,5 +18,9 @@ namespace kerbalgit.GameObjects {
 			EdgeOfLowSpace = edgeOfLowSpace;
 			SphereOfInfluence = sphereOfInfluence;
 		}
+
+		public override string ToString() {
+			return Name;
+		}
 	}
 }
