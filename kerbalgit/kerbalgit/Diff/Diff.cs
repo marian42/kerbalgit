@@ -54,8 +54,8 @@ namespace kerbalgit.Diff {
 
 			vesselDict[vessel.Id] = new VesselInfo(vessel);
 
-			foreach (var node in vessel.Node.Children.OfType<Node>().Where(node => node.Name == "part")) {
-				addPart(new Part(node, vessel), old);
+			foreach (var part in vessel.Parts) {
+				addPart(part, old);
 			}
 		}
 
@@ -91,6 +91,7 @@ namespace kerbalgit.Diff {
 			trackLostAndFoundShips();
 			compareVessels();
 			analyzeTechTree();
+			analyzeScienceData();
 		}
 
 		private void analyzeUnDocking() {
@@ -254,6 +255,23 @@ namespace kerbalgit.Diff {
 			var newTech = newSave.ResearchedTech.Where(tech => !oldSave.ResearchedTech.Contains(tech));
 			if (newTech.Any()) {
 				addMessage("Researched " + CommitMessage.Enumerate(newTech.Select(item => item.Name)) + ".", 2);
+			}
+		}
+
+		private void analyzeScienceData() {
+			foreach (var vesselInfo in newVessels.Values) {
+				var existingScience = vesselInfo.CorrespondingVessels.SelectMany(vessel => vessel.ScienceData);
+				var newScienceData = vesselInfo.Vessel.ScienceData.Where(data => !existingScience.Contains(data));
+
+				if (newScienceData.Any()) {
+					if (newScienceData.Count() == 1) {
+						addMessage("Performed experiment: " + newScienceData.First().Title + ".", 2);
+					} else if (newScienceData.Count() > 3) {
+						addMessage("Performed experiments: " + string.Join(", ", newScienceData.OrderByDescending(data => data.Data).Take(3).Select(data => data.Title)) + " and " + (newScienceData.Count() - 3) + " more.", 2);
+					} else {
+						addMessage("Performed experiments: " + CommitMessage.Enumerate(newScienceData.Select(data => data.Title)) + ".", 2);
+					}					
+				}
 			}
 		}
 	}

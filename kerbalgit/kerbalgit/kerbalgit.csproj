@@ -54,6 +54,7 @@
     <Compile Include="GameObjects\Orbit.cs" />
     <Compile Include="GameObjects\Planetarium.cs" />
     <Compile Include="GameObjects\Savegame.cs" />
+    <Compile Include="GameObjects\ScienceData.cs" />
     <Compile Include="GameObjects\TechTreeNode.cs" />
     <Compile Include="Git\SaveGameObserver.cs" />
     <Compile Include="Parser.cs" />

@@ -37,7 +37,7 @@ namespace kerbalgit.GameObjects {
 		}
 
 		public readonly Node Node;
-		public readonly List<Part> parts;
+		public readonly IEnumerable<Part> Parts;
 		public readonly Orbit Orbit;
 
 		public Vessel(Node node) {
@@ -46,7 +46,7 @@ namespace kerbalgit.GameObjects {
 			}
 
 			this.Node = node;
-			this.parts = new List<Part>();
+			this.Parts = getParts();
 			this.Orbit = new Orbit(node.Get("orbit") as Node);
 		}
 
@@ -159,6 +159,18 @@ namespace kerbalgit.GameObjects {
 
 		public override string ToString() {
 			return Name;
+		}
+
+		public IEnumerable<ScienceData> ScienceData {
+			get {
+				return Parts.SelectMany(part => part.ScienceData);
+			}
+		}
+
+		private IEnumerable<Part> getParts() {
+			foreach (var node in Node.Children.OfType<Node>().Where(node => node.Name == "part")) {
+				yield return new Part(node as Node, this);
+			}
 		}
 	}
 }
