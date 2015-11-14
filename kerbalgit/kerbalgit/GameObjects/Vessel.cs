@@ -52,7 +52,11 @@ namespace kerbalgit.GameObjects {
 
 		public string Id {
 			get {
-				return Node.GetValue("pid");
+				var pid = Node.GetValue("pid");
+				if (pid == "00000000000000000000000000000000") {
+					return Name;
+				}
+				return pid;
 			}
 		}
 
