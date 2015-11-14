@@ -150,6 +150,7 @@ namespace kerbalgit.Diff {
 						case Vessel.FlighState.Splashed:
 							addMessage("Launched " + vesselInfo.Vessel.Name + " and splashed down on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
 						case Vessel.FlighState.Orbiting:
+						case Vessel.FlighState.Sub_Orbital:
 							addMessage("Launched " + vesselInfo.Vessel.Name + " into " + vesselInfo.Vessel.Orbit.GetName(true, true) + ".", 0); break;
 						default: throw new NotImplementedException(vesselInfo.Vessel.FlightStateValue.ToString());
 					}

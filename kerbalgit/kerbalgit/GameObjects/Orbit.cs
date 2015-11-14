@@ -69,7 +69,7 @@ namespace kerbalgit.GameObjects {
 
 		public NamedInclination NamedInclinationValue {
 			get {
-				if ((Inclination > -5 && Inclination < 5) || (Inclination > 175 || Inclination < 185)) {
+				if ((Inclination > -5 && Inclination < 5) || (Inclination > 175 && Inclination < 185)) {
 					return NamedInclination.Equatorial;
 				} else if ((Inclination > 85 && Inclination < 95) || (Inclination < - 85) || (Inclination > 265)) {
 					return NamedInclination.Polar;
