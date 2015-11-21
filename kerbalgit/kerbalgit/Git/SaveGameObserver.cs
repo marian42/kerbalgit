@@ -124,7 +124,6 @@ namespace kerbalgit.Git {
 			}
 
 			repository.CreateBranch(BRANCH_NAME_PREFIX + branchNameIndex);
-			repository.Refs.UpdateTarget(repository.Refs.Head, commit.Id);
 			repository.Refs.UpdateTarget(mainBranch.CanonicalName, commit.Sha);
 		}
 
