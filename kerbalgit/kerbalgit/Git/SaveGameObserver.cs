@@ -36,9 +36,22 @@ namespace kerbalgit.Git {
 
 		private Savegame getWorkingContentSavegame() {
 			string workingContent;
-			using (var content = new StreamReader(repository.Info.WorkingDirectory + Path.DirectorySeparatorChar + FILENAME, Encoding.UTF8)) {
-				workingContent = content.ReadToEnd();
-			}
+
+			StreamReader contentStream = null;
+			bool openedSuccessfuly = true;
+
+			do {
+				try {
+					contentStream = new StreamReader(repository.Info.WorkingDirectory + Path.DirectorySeparatorChar + FILENAME, Encoding.UTF8);
+				}
+				catch (IOException) {
+					openedSuccessfuly = false;
+					System.Threading.Thread.Sleep(1000);
+				}
+			} while (!openedSuccessfuly);
+
+			workingContent = contentStream.ReadToEnd();
+			contentStream.Close();
 
 			return Parser.ParseSavegame(workingContent);
 		}
