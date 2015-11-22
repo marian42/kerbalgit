@@ -23,7 +23,9 @@ namespace kerbalgit.GameObjects {
 			Debris,
 			Asteroid,
 			EVA,
-			SpaceObject
+			SpaceObject,
+			Rover,
+			Base
 		}
 
 		public enum DiscoveryLevel {
