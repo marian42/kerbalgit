@@ -87,7 +87,7 @@ namespace kerbalgit.Git {
 			var commit = repository.Head.Tip;
 			var commitTime = getSavegame(commit).Time;
 
-			while (commitTime > currentTime) {
+			while (commitTime >= currentTime) {
 				commit = commit.Parents.First();
 				commitTime = getSavegame(commit).Time;
 			}
