@@ -56,7 +56,9 @@
     <Compile Include="GameObjects\Savegame.cs" />
     <Compile Include="GameObjects\ScienceData.cs" />
     <Compile Include="GameObjects\TechTreeNode.cs" />
-    <Compile Include="Git\SaveGameObserver.cs" />
+    <Compile Include="Git\CommitMessageRewriter.cs" />
+    <Compile Include="Git\KerbalRepository.cs" />
+    <Compile Include="Git\RepositoryObserver.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="GameObjects\Part.cs" />
     <Compile Include="Test.cs" />
