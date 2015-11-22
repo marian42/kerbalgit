@@ -33,9 +33,14 @@ namespace kerbalgit.Git {
 		}
 
 		private CommitRewriteInfo rewriteCommit(Commit commit) {
+			onRewriteCommit();
 			return CommitRewriteInfo.From(commit, message: commit.Parents.Any() ? repository.CreateDiff(commit).Message : commit.Message);
-		}		
-		
+		}
+
+		private void onRewriteCommit() {
+			completedCommits++;
+			Console.WriteLine("Rewriting commit messages... " + (100 * completedCommits / totalCommits) + "% complete.");
+		}
 
 		public void Run() {
 			var commitsToUpdate = getAllCommits();
