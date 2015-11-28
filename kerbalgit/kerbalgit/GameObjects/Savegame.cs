@@ -7,12 +7,14 @@ namespace kerbalgit.GameObjects {
 		public readonly RootNode Node;
 		public readonly IEnumerable<Vessel> Vessels;
 		public readonly IEnumerable<TechTreeNode> ResearchedTech;
+		public readonly IEnumerable<Contract> Contracts;
 
 		public Savegame(RootNode node) {
 			this.Node = node;
 
 			Vessels = findVessels();
 			ResearchedTech = findTech();
+			Contracts = findContracts();
 		}
 
 		private IEnumerable<Vessel> findVessels() {
@@ -20,6 +22,22 @@ namespace kerbalgit.GameObjects {
 
 			foreach (var node in flightstateNode.Children.OfType<Node>().Where(node => node.Name == "vessel")) {
 				yield return new Vessel(node as Node);
+			}
+		}
+
+		private IEnumerable<Contract> findContracts() {
+			var scenarioNode = Node.Children.FirstOrDefault(child => child.Name == "scenario" && child.GetValue("name") == "ContractSystem") as Node;
+
+			if (scenarioNode == null) {
+				yield break;
+			}
+
+			var contractsNode = scenarioNode.Get("contracts") as Node;
+
+			foreach (var childNode in contractsNode.Children) {
+				if (childNode.Name == "contract" || childNode.Name == "contract_finished") {
+					yield return new Contract(childNode as Node);
+				}
 			}
 		}
 

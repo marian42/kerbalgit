@@ -92,6 +92,32 @@ namespace kerbalgit.Diff {
 			compareVessels();
 			analyzeTechTree();
 			analyzeScienceData();
+			analyzeContracts();
+		}
+
+		private void analyzeContracts() {
+			var acceptedContracts = new List<Contract>();
+
+			foreach (var contract in newSave.Contracts) {
+				var oldContract = oldSave.Contracts.FirstOrDefault(old => old.Id == contract.Id);
+
+				if (oldContract != null) {
+					if (oldContract.State == Contract.ContractState.Offered && contract.State == Contract.ContractState.Active) {
+						acceptedContracts.Add(contract);
+					}
+					if (oldContract.State == Contract.ContractState.Active && contract.State == Contract.ContractState.Completed) {
+						addMessage("Completed contract (" + contract.Name + ").", 2);
+					}
+				} else {
+					if (contract.State == Contract.ContractState.Active) {
+						acceptedContracts.Add(contract);
+					}
+				}
+			}
+
+			if (acceptedContracts.Any()) {
+				addMessage("Accepted " + (acceptedContracts.Count() > 1 ? acceptedContracts.Count() + " contracts" : "contract") + " (" + CommitMessage.Enumerate(acceptedContracts.Select(contract => contract.Name)) + ").", 3);
+			}
 		}
 
 		private void analyzeUnDocking() {

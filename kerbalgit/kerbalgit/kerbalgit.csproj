@@ -51,6 +51,7 @@
     <Compile Include="Diff\OldNew.cs" />
     <Compile Include="Diff\VesselInfo.cs" />
     <Compile Include="GameObjects\CelestialBody.cs" />
+    <Compile Include="GameObjects\Contract.cs" />
     <Compile Include="GameObjects\Orbit.cs" />
     <Compile Include="GameObjects\Planetarium.cs" />
     <Compile Include="GameObjects\Savegame.cs" />
