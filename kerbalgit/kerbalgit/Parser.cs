@@ -58,6 +58,6 @@ namespace kerbalgit {
 			var parser = new Parser(lines);
 			var rootNode = parser.Parse();
 			return new Savegame(rootNode);
-		}		
+		}
 	}
 }

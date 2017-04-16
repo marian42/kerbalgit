@@ -119,7 +119,7 @@ namespace kerbalgit.Git {
 
 			Repository.Stage(FILENAME);
 
-			Signature author = new Signature("Name", "email@example.com", DateTime.Now);
+			Signature author = new Signature("Jeb Kerman", "email@example.com", DateTime.Now);
 
 			Commit commit = Repository.Commit(diff.Message, author, author);			
 		}
