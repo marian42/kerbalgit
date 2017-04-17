@@ -25,7 +25,8 @@ namespace kerbalgit.GameObjects {
 			EVA,
 			SpaceObject,
 			Rover,
-			Base
+			Base,
+			Relay
 		}
 
 		public enum DiscoveryLevel {

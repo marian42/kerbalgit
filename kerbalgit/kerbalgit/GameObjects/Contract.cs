@@ -26,7 +26,8 @@ namespace kerbalgit.GameObjects {
 			Offered,
 			Active,
 			Completed,
-			Cancelled
+			Cancelled,
+			DeadlineExpired
 		}
 
 		public readonly Node Node;
