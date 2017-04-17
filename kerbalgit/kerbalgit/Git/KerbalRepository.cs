@@ -12,10 +12,26 @@ namespace kerbalgit.Git {
 
 		public readonly string Folder;
 		public readonly Repository Repository;
+
+		private Repository initialize() {
+			Repository.Init(this.Folder);
+			var repo = new Repository(this.Folder);
+			repo.Stage(FILENAME);
+			Signature author = new Signature("Jeb Kerman", "email@example.com", DateTime.Now);
+
+			Commit commit = repo.Commit("Repo is GO!", author, author);
+			return new Repository(this.Folder);
+		}
 		
 		public KerbalRepository(string folder) {
 			this.Folder = folder;
-			this.Repository = new Repository(folder);
+			try {
+				this.Repository = new Repository(folder);
+			}
+			catch (RepositoryNotFoundException) {
+				Console.WriteLine("The save directory is not a git repository. Initializing a new repository now.");
+				this.Repository = this.initialize();
+			}
 		}
 
 		private static Savegame getSavegame(Commit commit) {
@@ -82,7 +98,7 @@ namespace kerbalgit.Git {
 			var commit = Repository.Head.Tip;
 			var commitTime = getSavegame(commit).Time;
 
-			while (commitTime >= currentTime) {
+			while (commitTime >= currentTime && commit.Parents.Any()) {
 				commit = commit.Parents.First();
 				commitTime = getSavegame(commit).Time;
 			}
@@ -121,7 +137,7 @@ namespace kerbalgit.Git {
 
 			Signature author = new Signature("Jeb Kerman", "email@example.com", DateTime.Now);
 
-			Commit commit = Repository.Commit(diff.Message, author, author);			
+			Commit commit = Repository.Commit(diff.Message, author, author);
 		}
 
 		public string Name {
