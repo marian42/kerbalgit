@@ -6,25 +6,25 @@ namespace kerbalgit.Git {
 	class RepositoryObserver {
 		private const string FILENAME = "persistent.sfs";
 		
-		private readonly KerbalRepository repository;
+		public readonly KerbalRepository Repository;
 
 		private Timer timer;
 
 		private DateTime lastChanged;
 
 		public RepositoryObserver(string folder) {
-			repository = new KerbalRepository(folder);
+			Repository = new KerbalRepository(folder);
 		}
 
 		private bool fileHasChanged {
 			get {
-				var fileInfo = new FileInfo(repository.Folder + FILENAME);
+				var fileInfo = new FileInfo(Repository.Folder + FILENAME);
 				return fileInfo.LastWriteTime != lastChanged;
 			}
 		}
 
 		private void setLastChanged() {
-			var fileInfo = new FileInfo(repository.Folder + FILENAME);
+			var fileInfo = new FileInfo(Repository.Folder + FILENAME);
 			lastChanged = fileInfo.LastWriteTime;
 		}		
 
@@ -36,13 +36,13 @@ namespace kerbalgit.Git {
 			}
 			setLastChanged();
 
-			Console.WriteLine("Reading " + repository.Name + "...");
-			var diff = repository.CreateDiff();
+			Console.WriteLine("Reading " + Repository.Name + "...");
+			var diff = Repository.CreateDiff();
 			if (!diff.AnyChanges) {
 				return;
 			}
 
-			repository.Commit(diff);
+			Repository.Commit(diff);
 		}
 
 		private void check(Object source, ElapsedEventArgs e) {
@@ -50,7 +50,7 @@ namespace kerbalgit.Git {
 		}
 
 		public void StartObserving() {
-			Console.WriteLine("Observing " + repository.Name + "...");
+			Console.WriteLine("Observing " + Repository.Name + "...");
 			check();
 
 			if (timer == null) {
@@ -62,7 +62,7 @@ namespace kerbalgit.Git {
 		}
 
 		public void RewriteAllCommits() {
-			var rewriter = new CommitMessageRewriter(repository);
+			var rewriter = new CommitMessageRewriter(Repository);
 			rewriter.Run();
 		}
 	}
