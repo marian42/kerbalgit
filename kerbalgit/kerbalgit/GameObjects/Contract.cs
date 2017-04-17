@@ -25,7 +25,8 @@ namespace kerbalgit.GameObjects {
 		public enum ContractState {
 			Offered,
 			Active,
-			Completed
+			Completed,
+			Cancelled
 		}
 
 		public readonly Node Node;

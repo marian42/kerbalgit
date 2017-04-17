@@ -50,7 +50,6 @@ namespace kerbalgit.Git {
 		}
 
 		public void StartObserving() {
-			Console.WriteLine("Observing " + Repository.Name + "...");
 			check();
 
 			if (timer == null) {
