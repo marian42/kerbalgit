@@ -59,10 +59,5 @@ namespace kerbalgit.Git {
 			timer.AutoReset = true;
 			timer.Enabled = true;
 		}
-
-		public void RewriteAllCommits() {
-			var rewriter = new CommitMessageRewriter(Repository);
-			rewriter.Run();
-		}
 	}
 }

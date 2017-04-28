@@ -39,7 +39,7 @@ namespace kerbalgit.Git {
 
 		private void onRewriteCommit() {
 			completedCommits++;
-			Console.WriteLine("Rewriting commit messages... " + (100 * completedCommits / totalCommits) + "% complete.");
+			Console.WriteLine("Rewriting commit messages of " + this.repository.Name + "... " + (100 * completedCommits / totalCommits) + "% complete.");
 		}
 
 		public void Run() {
