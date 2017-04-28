@@ -29,8 +29,6 @@ namespace kerbalgit.Git {
 		}		
 
 		private void check() {
-			Console.Write(".");
-
 			if (!fileHasChanged) {
 				return;
 			}
