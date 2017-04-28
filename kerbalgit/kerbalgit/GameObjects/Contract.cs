@@ -19,6 +19,7 @@ namespace kerbalgit.GameObjects {
 			PlantFlag,
 			PartTest,
 			StationContract,
+			ExplorationContract,
 			Unknown
 		}
 
@@ -124,6 +125,8 @@ namespace kerbalgit.GameObjects {
 						return "gather " + Node.GetValue("resourceTitle") + " from " + TargetBody;
 					case ContractType.SurveyContract:
 						return "survey " + TargetBody;
+					case ContractType.ExplorationContract:
+						return "explore " + TargetBody;
 					default: throw new NotImplementedException("No name defined for contract type " + Type);
 				}
 			}
