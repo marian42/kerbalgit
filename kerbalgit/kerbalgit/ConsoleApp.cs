@@ -35,17 +35,28 @@ namespace kerbalgit {
 		}
 
 		static void Main(string[] args) {
-			if (args.Contains("-h") || args.Contains("--help")) {
+			if (args.Contains("-h") || args.Contains("--help") || args.Contains("help")) {
 				Console.WriteLine("Kerbalgit");
 				return;
 			}
-			if (args.Contains("-r") || args.Contains("--rewrite")) {
+			if (args.Contains("rewrite")) {
 				var repository = new KerbalRepository(ConsoleApp.getSaveLocation());
 				var rewriter = new CommitMessageRewriter(repository);
 				rewriter.Run();
 				return;
 			}
-
+			if (args.Contains("log")) {
+				var repository = new KerbalRepository(ConsoleApp.getSaveLocation());
+				var items = repository.Repository.Head.Commits.Select(c => c.Message).ToList();
+				Console.WriteLine("Log of " + repository.Name + ":");
+				int i = items.Count();
+				foreach (var line in items.Reverse<string>()) {
+					Console.WriteLine(i.ToString().PadLeft(3) + ": " + line.Replace("\n", "").Trim());
+					i--;
+				}
+				Console.ReadLine();
+				return;
+			}
 			var observer = new RepositoryObserver(ConsoleApp.getSaveLocation());
 
 			Console.WriteLine("Observing " + observer.Repository.Name + "... Press any key to quit.");
