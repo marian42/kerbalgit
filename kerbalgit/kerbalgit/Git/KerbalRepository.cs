@@ -110,7 +110,7 @@ namespace kerbalgit.Git {
 		/// Creates a new branch for the current head (reverted mission)
 		/// and sets the previous branch (main mission) to the supplied commit
 		/// </summary>
-		private void safelyCheckoutCommit(Commit commit) {
+		private string safelyCheckoutCommit(Commit commit) {
 			if (commit == Repository.Head.Tip) {
 				throw new InvalidOperationException("HEAD already points at this commit.");
 			}
@@ -124,6 +124,7 @@ namespace kerbalgit.Git {
 
 			Repository.CreateBranch(BRANCH_NAME_PREFIX + branchNameIndex);
 			Repository.Refs.UpdateTarget(mainBranch.CanonicalName, commit.Sha);
+			return BRANCH_NAME_PREFIX + branchNameIndex;
 		}
 
 		public void Commit(Diff.Diff diff) {
@@ -144,6 +145,16 @@ namespace kerbalgit.Git {
 			get {
 				return Folder.Split(Path.DirectorySeparatorChar).Last(s => s.Any());
 			}
+		}
+
+		public void RevertTo(int commitsToSkip) {
+			Commit targetCommit = this.Repository.Head.Commits.ElementAt(commitsToSkip);
+			var branchName = this.safelyCheckoutCommit(targetCommit);
+			this.Repository.Unstage(FILENAME);
+			var opts = new CheckoutOptions();
+			opts.CheckoutModifiers = CheckoutModifiers.Force;
+			this.Repository.CheckoutPaths(this.Repository.Head.Tip.Sha, new string[] { FILENAME }, opts);
+			Console.WriteLine("Reverted " + commitsToSkip + " commits, old progress is backed up on branch " + branchName + ".");
 		}
 	}
 }

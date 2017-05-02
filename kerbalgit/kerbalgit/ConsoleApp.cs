@@ -49,11 +49,26 @@ namespace kerbalgit {
 				var repository = new KerbalRepository(ConsoleApp.getSaveLocation());
 				var items = repository.Repository.Head.Commits.Select(c => c.Message.Split('\n').First()).ToList();
 				Console.WriteLine("Log of " + repository.Name + ":");
-				int i = items.Count();
+				int i = items.Count() - 1;
 				foreach (var line in items.Reverse<string>()) {
 					Console.WriteLine(i.ToString().PadLeft(3) + ": " + line.Trim());
 					i--;
 				}
+				return;
+			}
+			if (args.Contains("revert")) {
+				int p = args.ToList().IndexOf("revert");
+				if (p == args.Count() - 1) {
+					Console.WriteLine("Missing argument: Speficy number of entries to revert.");
+					Environment.Exit(1);
+				}
+				int index = int.Parse(args[p + 1]);
+				if (index < 1) {
+					Console.WriteLine("Invalid value: " + args[p + 1]);
+					Environment.Exit(1);
+				}
+				var repository = new KerbalRepository(ConsoleApp.getSaveLocation());
+				repository.RevertTo(index);
 				return;
 			}
 			var observer = new RepositoryObserver(ConsoleApp.getSaveLocation());
