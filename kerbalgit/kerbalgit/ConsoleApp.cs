@@ -47,14 +47,13 @@ namespace kerbalgit {
 			}
 			if (args.Contains("log")) {
 				var repository = new KerbalRepository(ConsoleApp.getSaveLocation());
-				var items = repository.Repository.Head.Commits.Select(c => c.Message).ToList();
+				var items = repository.Repository.Head.Commits.Select(c => c.Message.Split('\n').First()).ToList();
 				Console.WriteLine("Log of " + repository.Name + ":");
 				int i = items.Count();
 				foreach (var line in items.Reverse<string>()) {
-					Console.WriteLine(i.ToString().PadLeft(3) + ": " + line.Replace("\n", "").Trim());
+					Console.WriteLine(i.ToString().PadLeft(3) + ": " + line.Trim());
 					i--;
 				}
-				Console.ReadLine();
 				return;
 			}
 			var observer = new RepositoryObserver(ConsoleApp.getSaveLocation());
