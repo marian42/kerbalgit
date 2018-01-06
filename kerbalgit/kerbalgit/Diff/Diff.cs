@@ -167,7 +167,7 @@ namespace kerbalgit.Diff {
 					addMessage("Planted flag on " + vesselInfo.Vessel.CelestialBody + ": \"" + vesselInfo.Vessel.Name + "\".", 1);
 				} else if (vesselInfo.Vessel.Type == Vessel.VesselType.EVA) {
 					addMessage(vesselInfo.Vessel.Name + " went on an EVA while " + vesselInfo.Vessel.Location + ".", 1);
-				} else {
+				} else if (vesselInfo.Vessel.Type != Vessel.VesselType.Debris) {
 					switch (vesselInfo.Vessel.FlightStateValue) {
 						case Vessel.FlighState.Prelaunch:
 							addMessage("Put " + vesselInfo.Vessel.Name + " on the " + vesselInfo.Vessel.Node.GetValue("landedAt").ToLower() + ".", 0); break;
