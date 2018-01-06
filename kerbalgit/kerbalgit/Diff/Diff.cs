@@ -175,10 +175,13 @@ namespace kerbalgit.Diff {
 							addMessage("Launched " + vesselInfo.Vessel.Name + " and landed on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
 						case Vessel.FlighState.Splashed:
 							addMessage("Launched " + vesselInfo.Vessel.Name + " and splashed down on " + vesselInfo.Vessel.CelestialBody.Name + ".", 0); break;
+						case Vessel.FlighState.Escaping:
 						case Vessel.FlighState.Orbiting:
 						case Vessel.FlighState.Sub_Orbital:
 							addMessage("Launched " + vesselInfo.Vessel.Name + " into " + vesselInfo.Vessel.Orbit.GetName(true, true) + ".", 0); break;
-						default: throw new NotImplementedException(vesselInfo.Vessel.FlightStateValue.ToString());
+						case Vessel.FlighState.Flying:
+							addMessage("Launched " + vesselInfo.Vessel.Name + " to fly around " + vesselInfo.Vessel.Orbit.CelestialBody.Name, 0); break;
+						default: throw new NotImplementedException("Unknown FlightState: " + vesselInfo.Vessel.FlightStateValue.ToString());
 					}
 				}
 			}
